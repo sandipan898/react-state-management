@@ -1,8 +1,11 @@
 import React from "react";
-import useFetchAll from "./services/useFetchAll";
+import { useNavigate } from "react-router-dom";
+// import useFetchAll from "./services/useFetchAll";
+import useFetchAll from "./services/useFetchAllRef";
 import Spinner from "./Spinner";
 
-export default function Cart({ cart, updateQuantity }) {
+export default function Cart({ cart, dispatch }) {
+  const navigate = useNavigate();
   const urls = cart.map((i) => `products/${i.id}`);
   const { data: products, loading, error } = useFetchAll(urls);
 
@@ -23,7 +26,13 @@ export default function Cart({ cart, updateQuantity }) {
           <p>
             <select
               aria-label={`Select quantity for ${name} size ${size}`}
-              onChange={(e) => updateQuantity(sku, parseInt(e.target.value))}
+              onChange={(e) =>
+                dispatch({
+                  type: "updateQuantity",
+                  sku,
+                  quantity: parseInt(e.target.value),
+                })
+              }
               value={quantity}
             >
               <option value="0">Remove</option>
@@ -43,14 +52,29 @@ export default function Cart({ cart, updateQuantity }) {
   if (error) throw error;
 
   // Using derived state -> calculating value from existing state
-  const numOfItemsInCart = cart.reduce((total, item) => total+item.quantity, 0);
+  const numOfItemsInCart = cart.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   return (
     <section id="cart">
       <h1>
-        {numOfItemsInCart === 0 ? "Your cart is empty" : `${numOfItemsInCart} item${numOfItemsInCart > 1 ? "s" : ""} in the cart`}
+        {numOfItemsInCart === 0
+          ? "Your cart is empty"
+          : `${numOfItemsInCart} item${
+              numOfItemsInCart > 1 ? "s" : ""
+            } in the cart`}
       </h1>
       <ul>{cart.map(renderItem)}</ul>
+      {cart.length > 0 && (
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/checkout")}
+        >
+          Checkout
+        </button>
+      )}
     </section>
   );
 }
