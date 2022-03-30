@@ -1,93 +1,85 @@
 import React, { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 import "./App.css";
+import Cart from "./Cart";
+import Checkout from "./Checkout";
+import Detail from "./Detail";
 import Footer from "./Footer";
 import Header from "./Header";
-import { getProducts } from "./services/productService";
-import Spinner from "./Spinner";
+import Products from "./Products";
 
 export default function App() {
-  const [size, setSize] = useState("");
-  /*
-  // same as above
-  const state = useState("");
-  const size = state[0];
-  const setSize = state[1];
-  */
+  // function inside useState is used for lazy binding. So the function only runs once when the component is rendered.
+  // if we assing the value directly then it will fetch the data from localstorage in every rerender.
+  // That will be expensive and causes performance issue.
+  const [cart, setCart] = useState(() => {
+    try {
+      // localstorage
+      return JSON.parse(localStorage.getItem("cart")) ?? [];
+    } catch {
+      console.error("Cart data couldn't be parsed into JSON!");
+      return [];
+    }
+  });
 
-  const [products, setProducts] = useState([]);
-
-  /*
   useEffect(() => {
-    // promise based call
-    // getProducts("shoes")
-    // .then(response => setProducts(response))
-    // .catch(e => setError(e))
-    // .finally(() => setLoading(false));
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
 
-    // async-await basde call
-    const init = async () => {
-      try {
-        const response = await getProducts("shoes");
-        setProducts(response);
-      } catch (e) {
-        setError(e);
-      } finally {
-        setLoading(false);
+  const addToCart = (id, sku) => {
+    // As we are updating state from the existing state, we are using 'Function form' of set Sate.
+    // It takes the previous state as argument and what ever value is returned that will be set as current state.
+    setCart((items) => {
+      const itemInCart = items.find((item) => item.sku === sku);
+      // itemInCart.quantity++; // DON'T DO THIS
+      if (itemInCart) {
+        // return new array with the matching item replaced
+        return items.map((item) =>
+          item.sku === sku ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      } else {
+        // return new array with the new item appended
+        return [...items, { id, sku, quantity: 1 }];
       }
-    };
-    init();
-  }, []);
-  */
+    });
+  };
 
-  function renderProduct(p) {
-    return (
-      <div key={p.id} className="product">
-        <a href="/">
-          <img src={`/images/${p.image}`} alt={p.name} />
-          <h3>{p.name}</h3>
-          <p>${p.price}</p>
-        </a>
-      </div>
-    );
-  }
-
-  // Implementing derived state
-  const filteredProducts = size
-    ? products.filter((product) =>
-        product.skus.find((s) => s.size === parseInt(size))
-      )
-    : products;
-
-  if (error) throw error;
-
-  if (loading) return <Spinner />;
-
+  const updateQuantity = (sku, quantity) => {
+    setCart((items) => {
+      return quantity === 0
+        ? items.filter((item) => item.sku !== sku) // filter accepts a predicate (function) which returns true or false
+        : items.map((item) =>
+            item.sku === sku ? { ...item, quantity } : item
+          );
+    });
+  };
   return (
     <>
       <div className="content">
         <Header />
         <main>
-          <section id="filters">
-            <label htmlFor="size">Filter by Size:</label>{" "}
-            <select
-              id="size"
-              value={size}
-              onChange={(e) => {
-                // debugger;
-                setSize(e.target.value);
-              }}
-            >
-              <option value="">All sizes</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-            </select>
-            {size && <h2>{filteredProducts.length} items found.</h2>}
-          </section>
-          <section id="products">{filteredProducts.map(renderProduct)}</section>
+          <Routes>
+            <Route path="/" element={<h1>Welcome to Carved Rock Fitness</h1>} />
+            <Route path="/:category" element={<Products />} />{" "}
+            {/* Named placeholder -> these can be received from the respective component using useParams Hook from react-router-dom by destructuring it */}
+            <Route
+              path="/:category/:id"
+              element={<Detail addToCart={addToCart} />}
+            />
+            <Route
+              path="/cart"
+              element={<Cart cart={cart} updateQuantity={updateQuantity} />}
+            />
+            <Route path="/checkout" element={<Checkout cart={cart} />} />
+          </Routes>
         </main>
       </div>
       <Footer />
     </>
   );
 }
+
+/**
+ * Update Immutable friendly way -> array.map
+ * Remove Immutable friendly way -> array.filter
+ */
