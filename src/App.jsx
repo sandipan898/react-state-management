@@ -1,24 +1,16 @@
-import React, { useReducer, useEffect } from "react";
+import React from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import Cart from "./Cart";
-import Checkout from "./Checkout";
+// import Checkout from "./Checkout";
+import Checkout from "./Checkout.class";
 // import Detail from "./DetailRefs";
-import Detail from "./Detail";
+// import Detail from "./Detail";
+import Detail from "./Detail.class";
 import Footer from "./Footer";
 import Header from "./Header";
 import Products from "./Products";
-import CartReducer from "./cartReducer";
-import { CartContext } from "./cartContext";
-
-let initialCart;
-try {
-  // localstorage
-  initialCart = JSON.parse(localStorage.getItem("cart")) ?? [];
-} catch {
-  console.error("Cart data couldn't be parsed into JSON!");
-  initialCart = [];
-}
+import { useCart } from "./cartContext";
 
 export default function App() {
   /*
@@ -35,12 +27,6 @@ export default function App() {
     }
   });
   */
-
-  const [cart, dispatch] = useReducer(CartReducer, initialCart);
-
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
 
   /*
   const addToCart = (id, sku) => {
@@ -76,8 +62,10 @@ export default function App() {
   };
   */
 
+  const { dispatch } = useCart();
+
   return (
-    <CartContext.Provider value={{cart, dispatch}}>
+    <>
       <div className="content">
         <Header />
         <main>
@@ -85,23 +73,14 @@ export default function App() {
             <Route path="/" element={<h1>Welcome to Carved Rock Fitness</h1>} />
             <Route path="/:category" element={<Products />} />{" "}
             {/* Named placeholder -> these can be received from the respective component using useParams Hook from react-router-dom by destructuring it */}
-            <Route
-              path="/:category/:id"
-              element={<Detail dispatch={dispatch} />}
-            />
-            <Route
-              path="/cart"
-              element={<Cart cart={cart} dispatch={dispatch} />}
-            />
-            <Route
-              path="/checkout"
-              element={<Checkout cart={cart} dispatch={dispatch} />}
-            />
+            <Route path="/:category/:id" element={<Detail />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout dispatch={dispatch} />} />
           </Routes>
         </main>
       </div>
       <Footer />
-    </CartContext.Provider>
+    </>
   );
 }
 

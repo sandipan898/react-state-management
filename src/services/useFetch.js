@@ -42,3 +42,13 @@ export default function useFetch(url) {
   }, [url]);
   return { data, error, loading };
 }
+
+/**
+ * Render Prop:
+ * It acepts a prop called render
+ * then passes the data or functions to that render function
+ */
+export function Fetch({ url, children }) {
+  const { data, loading, error } = useFetch(url);
+  return children(data, loading, error);
+}

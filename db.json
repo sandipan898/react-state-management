@@ -94,6 +94,36 @@
       "city": "Chandannagar",
       "country": "India",
       "id": 7
+    },
+    {
+      "city": "New York",
+      "country": "United Kingdom",
+      "id": 8
+    },
+    {
+      "city": "Kolkata",
+      "country": "India",
+      "id": 9
+    },
+    {
+      "city": "a little big city",
+      "country": "India",
+      "id": 10
+    },
+    {
+      "city": "Kolkata",
+      "country": "India",
+      "id": 11
+    },
+    {
+      "city": "Kolkata",
+      "country": "India",
+      "id": 12
+    },
+    {
+      "city": "New York",
+      "country": "United Kingdom",
+      "id": 13
     }
   ]
 }
