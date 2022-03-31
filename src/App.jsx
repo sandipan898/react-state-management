@@ -10,9 +10,11 @@ import Detail from "./Detail.class";
 import Footer from "./Footer";
 import Header from "./Header";
 import Products from "./Products";
+// import Products from "./Products.react-query";
 import { useCart } from "./cartContext";
 
 export default function App() {
+  
   /*
   // function inside useState is used for lazy binding. So the function only runs once when the component is rendered.
   // if we assing the value directly then it will fetch the data from localstorage in every rerender.

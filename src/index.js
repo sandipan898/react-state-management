@@ -6,12 +6,12 @@ import ErrorBoundary from "./ErrorBoundary";
 import { CartProvider } from "./cartContext";
 
 ReactDOM.render(
-  <ErrorBoundary>
-    <BrowserRouter>
-      <CartProvider>
-        <App />,
-      </CartProvider>
-    </BrowserRouter>
-  </ErrorBoundary>,
+    <ErrorBoundary>
+      <BrowserRouter>
+        <CartProvider>
+          <App />
+        </CartProvider>
+      </BrowserRouter>
+    </ErrorBoundary>,
   document.getElementById("root")
 );
